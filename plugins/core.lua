@@ -2,23 +2,67 @@ return {
   -- customize alpha options
   {
     "goolord/alpha-nvim",
-    opts = function(_, opts)
-      -- customize the dashboard header
-      opts.section.header.val = {
-        " █████  ███████ ████████ ██████   ██████",
-        "██   ██ ██         ██    ██   ██ ██    ██",
-        "███████ ███████    ██    ██████  ██    ██",
-        "██   ██      ██    ██    ██   ██ ██    ██",
-        "██   ██ ███████    ██    ██   ██  ██████",
-        " ",
-        "    ███    ██ ██    ██ ██ ███    ███",
-        "    ████   ██ ██    ██ ██ ████  ████",
-        "    ██ ██  ██ ██    ██ ██ ██ ████ ██",
-        "    ██  ██ ██  ██  ██  ██ ██  ██  ██",
-        "    ██   ████   ████   ██ ██      ██",
+    event = "VimEnter",
+    opts = function(_, dashboard)
+      dashboard.section.buttons.val = {
+        dashboard.button("f", "  Find file", ":Telescope find_files <CR>"),
+        dashboard.button("e", "  New file", ":ene <BAR> startinsert <CR>"),
+        dashboard.button("p", "  Find project", ":Telescope project <CR>"),
+        dashboard.button("r", "  Recently used files", ":Telescope oldfiles <CR>"),
+        dashboard.button("t", "  Find text", ":Telescope live_grep <CR>"),
+        dashboard.button("c", "  Configuration", ":e $MYVIMRC <CR>"),
+        dashboard.button("z", "鈴 Lazy", ":Lazy<CR>"),
+        dashboard.button("q", "  Quit Neovim", ":qa<CR>"),
       }
-      return opts
+
+      dashboard.config.opts.noautocmd = true
+
+      dashboard.section.footer.val = "MikkaLab"
+
+      dashboard.section.footer.opts.hl = "Type"
+      dashboard.section.header.opts.hl = "Include"
+      dashboard.section.buttons.opts.hl = "Keyword"
+
+      dashboard.opts.opts.noautocmd = true
+      -- vim.cmd([[autocmd User AlphaReady echo 'ready']])
+
+      return dashboard
     end,
+  },
+  {
+    "folke/which-key.nvim",
+    config = function(plugin, opts)
+      require "plugins.configs.which-key"(plugin, opts) -- include the default astronvim config that calls the setup call
+      -- Add bindings which show up as group name
+      local wk = require "which-key"
+      wk.register({
+        ["e"] = { "<cmd>NvimTreeToggle<cr>", "Explorer" },
+        b = { name = "Buffer" },
+        m = {
+          name = "Markdown",
+          p = { "<cmd>MarkdownPreview<cr>", "Preview" },
+          s = { "<cmd>MarkdownPreviewStop<cr>", "Stop Preview" },
+        },
+        r = {
+          name = "Run",
+          s = {
+            '<cmd>autocmd bufwritepost [^_]*.sass,[^_]*.scss  silent exec "!sass %:p %:r.css"<CR>',
+            "Auto Compile Sass",
+          },
+          r = { "<cmd>RunCode<CR>", "Run Code" },
+          f = { "<cmd>RunFile<CR>", "Run File" },
+          p = { "<cmd>RunProject<CR>", "Run Project" },
+          m = {
+            "<cmd>ToggleTerm size=70 direction=float<cr>mvn exec:java -Dexec.mainClass=com.pojokcode.App<cr>",
+            "Run MVN",
+          },
+        },
+      }, { mode = "n", prefix = "<leader>" })
+    end,
+  },
+  {
+    "famiu/bufdelete.nvim",
+    event = "BufRead",
   },
   -- You can disable default plugins as follows:
   -- { "max397574/better-escape.nvim", enabled = false },
